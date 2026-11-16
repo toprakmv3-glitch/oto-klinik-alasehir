@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /api/*
 
 Sitemap: https://www.otoklinik45600.site/sitemap.xml

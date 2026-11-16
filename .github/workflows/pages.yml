@@ -23,8 +23,20 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Prepare site files
         run: |
-          mkdir -p _site
-          cp index.html robots.txt sitemap.xml og-card.jpg _site/
+          mkdir -p _site/assets
+          cp index.html og-card.jpg _site/
+          cp -R assets/. _site/assets/
+          python3 - <<'PY'
+          from pathlib import Path
+          page = Path('_site/index.html')
+          html = page.read_text(encoding='utf-8')
+          indexed = '<meta content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" name="robots"/>'
+          noindex = '<meta content="noindex,follow" name="robots"/>'
+          if html.count(indexed) != 1:
+              raise SystemExit('Expected exactly one source robots meta tag')
+          page.write_text(html.replace(indexed, noindex, 1), encoding='utf-8')
+          PY
+          printf 'User-agent: *\nAllow: /\n' > _site/robots.txt
           touch _site/.nojekyll
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
